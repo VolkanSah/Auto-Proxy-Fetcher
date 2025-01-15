@@ -26,14 +26,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Set up Selenium with Chrome in Docker
-        uses: docker://selenium/standalone-chrome:latest
+      - name: Run proxy fetcher in accetto/ubuntu-vnc-xfce-chromium-g3 Docker
+        uses: docker://accetto/ubuntu-vnc-xfce-chromium-g3
         with:
           entrypoint: /bin/bash
           args: |
             -c "
-            # Clean APT lists and update repositories
-            rm -rf /var/lib/apt/lists/*
+            # Clean up any existing apt cache and install necessary packages
             apt-get update && apt-get install -y sudo python3 python3-pip && \
             python3 -m venv /workspace/venv && \
             source /workspace/venv/bin/activate && \
