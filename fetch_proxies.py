@@ -47,7 +47,7 @@ class ProxyFetcher:
             return
 
         try:
-            # Spezielle Behandlung für JSON APIs
+            # Special handling for JSON APIs
             if 'api' in url:
                 if 'geonode' in url:
                     import json
@@ -57,13 +57,13 @@ class ProxyFetcher:
                         self.proxies.add(proxy)
                     return
 
-            # Standard Zeilen-basierte Parsing
+            # Standard line-based parsing
             lines = content.split('\n')
             for line in lines:
                 line = line.strip()
                 if line and ':' in line:
                     try:
-                        # Entferne zusätzliche Informationen nach dem Port
+                        # Remove extra information after the port
                         proxy = line.split()[0] if ' ' in line else line
                         host, port = proxy.split(':')[:2]
                         if host and port.isdigit() and 1 <= int(port) <= 65535:
@@ -96,7 +96,7 @@ class ProxyFetcher:
         ssl_context.verify_mode = ssl.CERT_NONE
 
         # Use the custom SSL context in the aiohttp session
-        async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl_context=ssl_context)) as session:
+        async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=ssl_context)) as session:
             tasks = [self.fetch_url(session, url) for url in self.sources]
             results = await asyncio.gather(*tasks)
             
@@ -109,23 +109,27 @@ class ProxyFetcher:
             await asyncio.gather(*check_tasks)
 
     def save_proxies(self):
-        if not self.valid_proxies:
-            logger.warning("No valid proxies found to save!")
+        if not self.proxies:
+            logger.warning("No proxies found to save!")
             return
 
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        with open('valid_proxies.txt', 'w') as f:
-            f.write(f"# Valid Proxy List - Updated: {timestamp}\n")
+        with open('proxies.txt', 'w') as f:
+            f.write(f"# Proxy List - Updated: {timestamp}\n")
+            f.write(f"# Total proxies: {len(self.proxies)}\n")
             f.write(f"# Total valid proxies: {len(self.valid_proxies)}\n")
             f.write(f"# Sources used: {len(self.sources)}\n\n")
             
-            # Sortiere Proxies nach IP und Port
-            sorted_proxies = sorted(self.valid_proxies, key=lambda x: tuple(map(int, x.split(':')[0].split('.') + [x.split(':')[1]])))
+            # Save all proxies (valid and invalid)
+            f.write("# All Proxies:\n")
+            for proxy in sorted(self.proxies):
+                f.write(f"{proxy}\n")
             
-            for proxy in sorted_proxies:
+            f.write("\n# Valid Proxies:\n")
+            for proxy in sorted(self.valid_proxies):
                 f.write(f"{proxy}\n")
         
-        logger.info(f"Saved {len(self.valid_proxies)} valid proxies to valid_proxies.txt")
+        logger.info(f"Saved {len(self.proxies)} proxies and {len(self.valid_proxies)} valid proxies to proxies.txt")
 
 async def main():
     fetcher = ProxyFetcher()
