@@ -16,20 +16,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-
       - name: Run proxy fetcher in accetto/ubuntu-vnc-xfce-chromium-g3 Docker as root
         run: |
           docker run --rm --user root --workdir /github/workspace -v /github/workspace:/workspace accetto/ubuntu-vnc-xfce-chromium-g3 bash -c "
-            apt-get update -y && apt-get install -y python3 python3-pip python3-venv && \
+            apt-get update -y && apt-get install -y python3 python3-pip python3-venv git && \
+            git clone https://github.com/MythEclipse/Auto-Proxy-Fetcher.git /workspace && \
+            cd /workspace && \
             python3 -m venv /workspace/venv && \
             source /workspace/venv/bin/activate && \
             pip install --upgrade pip && \
