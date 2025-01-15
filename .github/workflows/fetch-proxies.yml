@@ -16,8 +16,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Docker container with Chromium and Chromedriver
-        uses: docker://zenika/alpine-chrome:with-driver
+      - name: Set up Selenium with Chrome
+        uses: docker://selenium/standalone-chrome:latest
         with:
           args: /bin/bash -c "pip install -r requirements.txt && python fetch_proxies.py"
 
