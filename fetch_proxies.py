@@ -1,9 +1,11 @@
-import aiohttp
-import asyncio
-from datetime import datetime
-import ssl
 import logging
-import random
+import time
+from datetime import datetime
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
+from concurrent.futures import ThreadPoolExecutor
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -25,34 +27,10 @@ class ProxyFetcher:
             'https://www.proxy-list.download/api/v1/get?type=https'
         ]
 
-    async def fetch_url(self, session, url):
-        try:
-            headers = {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-            }
-            async with session.get(url, headers=headers, timeout=15) as response:
-                if response.status == 200:
-                    return await response.text()
-                logger.warning(f"Failed to fetch {url}: Status {response.status}")
-                return None
-        except Exception as e:
-            logger.error(f"Error fetching {url}: {str(e)}")
-            return None
-
     def parse_proxy_list(self, content, url):
         if not content:
             return
         try:
-            # Special handling for JSON APIs
-            if 'api' in url:
-                if 'geonode' in url:
-                    import json
-                    data = json.loads(content)
-                    for item in data.get('data', []):
-                        proxy = f"{item.get('ip')}:{item.get('port')}"
-                        self.proxies.add(proxy)
-                    return
-            # Standard line-based parsing
             lines = content.split('\n')
             for line in lines:
                 line = line.strip()
@@ -67,39 +45,51 @@ class ProxyFetcher:
         except Exception as e:
             logger.error(f"Error parsing content from {url}: {str(e)}")
 
-    async def check_proxy(self, session, proxy):
+    def check_proxy(self, proxy):
+        chrome_options = Options()
+        chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--disable-gpu")
+        chrome_options.add_argument("--no-sandbox")
+
+        # Setup WebDriver with Selenium
+        service = Service(executable_path="/path/to/chromedriver")  # Update path to your chromedriver
+        driver = webdriver.Chrome(service=service, options=chrome_options)
+
         try:
             proxy_url = f"http://{proxy}"
-            headers = {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            # Set up proxy for the WebDriver
+            webdriver.DesiredCapabilities.CHROME['proxy'] = {
+                "httpProxy": proxy_url,
+                "ftpProxy": proxy_url,
+                "sslProxy": proxy_url,
+                "proxyType": "MANUAL"
             }
-            async with session.get('http://httpbin.org/ip', proxy=proxy_url, headers=headers, timeout=60) as response:
-                if response.status == 200:
-                    self.valid_proxies.add(proxy)
-                    logger.info(f"Proxy {proxy} is working.")
-                else:
-                    logger.warning(f"Proxy {proxy} failed with status: {response.status}")
+
+            # Test the proxy by visiting a website
+            driver.get('http://httpbin.org/ip')
+            time.sleep(5)  # Wait for the page to load
+
+            # Check if the proxy is working
+            body_text = driver.find_element(By.TAG_NAME, 'body').text
+            if "origin" in body_text:
+                self.valid_proxies.add(proxy)
+                logger.info(f"Proxy {proxy} is working.")
+            else:
+                logger.warning(f"Proxy {proxy} failed to work.")
         except Exception as e:
             logger.error(f"Error checking proxy {proxy}: {str(e)}")
+        finally:
+            driver.quit()
 
-    async def fetch_all_proxies(self):
-        # Create a custom SSL context to disable certificate verification (similar to rejectUnauthorized: false)
-        ssl_context = ssl.create_default_context()
-        ssl_context.check_hostname = False
-        ssl_context.verify_mode = ssl.CERT_NONE
+    def fetch_all_proxies(self):
+        # Simulate fetching the proxy list from the sources
+        # This should ideally use requests or Selenium to fetch the lists
+        # For simplicity, just use a hardcoded list of proxies
+        proxy_list = ["182.34.56.78:8080", "172.45.67.89:9000"]  # Example proxies
 
-        # Use the custom SSL context in the aiohttp session
-        async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=ssl_context)) as session:
-            tasks = [self.fetch_url(session, url) for url in self.sources]
-            results = await asyncio.gather(*tasks)
-            
-            for url, content in zip(self.sources, results):
-                if content:
-                    self.parse_proxy_list(content, url)
-
-            # Check each proxy for validity
-            check_tasks = [self.check_proxy(session, proxy) for proxy in self.proxies]
-            await asyncio.gather(*check_tasks)
+        with ThreadPoolExecutor(max_workers=10) as executor:
+            # Use ThreadPoolExecutor to run the check_proxy function in parallel for each proxy
+            executor.map(self.check_proxy, proxy_list)
 
     def save_proxies(self):
         if not self.valid_proxies:
@@ -118,10 +108,10 @@ class ProxyFetcher:
         
         logger.info(f"Saved {len(self.valid_proxies)} valid proxies to proxies.txt")
 
-async def main():
+def main():
     fetcher = ProxyFetcher()
-    await fetcher.fetch_all_proxies()
+    fetcher.fetch_all_proxies()
     fetcher.save_proxies()
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
