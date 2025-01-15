@@ -21,21 +21,24 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Create virtual environment
-        run: |
-          python -m venv venv
-          source venv/bin/activate
-          python -m pip install --upgrade pip
-
       - name: Install dependencies
         run: |
-          source venv/bin/activate
+          python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Set up Selenium with Chrome
+      - name: Set up Selenium with Chrome in Docker
         uses: docker://selenium/standalone-chrome:latest
         with:
-          args: /bin/bash -c "source /workspace/venv/bin/activate && pip install -r requirements.txt && python fetch_proxies.py"
+          entrypoint: /bin/bash
+          args: |
+            -c "
+            # Create and activate a virtual environment inside the container
+            python -m venv /workspace/venv && \
+            source /workspace/venv/bin/activate && \
+            pip install --upgrade pip && \
+            pip install -r /workspace/requirements.txt && \
+            python /workspace/fetch_proxies.py
+            "
 
       - name: Commit and push if changed
         run: |
