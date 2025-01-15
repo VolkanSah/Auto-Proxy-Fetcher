@@ -2,17 +2,17 @@ name: Auto Proxy Fetch
 
 on:
   schedule:
-    - cron: '0 */6 * * *'  # Läuft alle 6 Stunden
-  workflow_dispatch:        # Manueller Trigger
+    - cron: '0 */6 * * *'  # Runs every 6 hours
+  workflow_dispatch:        # Manual trigger
   push:
     paths:
-      - 'fetch_proxies.py' # Läuft wenn das Script geändert wird
+      - 'fetch_proxies.py'  # Runs when the script is changed
 
 jobs:
   fetch-and-update:
     runs-on: ubuntu-latest
     permissions:
-      contents: write     # Erlaubt das Pushen von Änderungen
+      contents: write     # Allows pushing changes
       
     steps:
       - name: Checkout repository
@@ -28,6 +28,19 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+
+      - name: Install Chrome and Chromedriver
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget curl unzip
+          sudo apt-get install -y chromium-browser
+          CHROMIUM_VERSION=$(chromium-browser --version | sed 's/.* \([0-9]*\)\..*/\1/')
+          DRIVER_VERSION=$(curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROMIUM_VERSION)
+          wget https://chromedriver.storage.googleapis.com/$DRIVER_VERSION/chromedriver_linux64.zip
+          unzip chromedriver_linux64.zip
+          sudo mv chromedriver /usr/local/bin/
+          sudo chown root:root /usr/local/bin/chromedriver
+          sudo chmod +x /usr/local/bin/chromedriver
 
       - name: Run proxy fetcher
         run: python fetch_proxies.py
