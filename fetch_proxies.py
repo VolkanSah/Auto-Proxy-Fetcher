@@ -80,7 +80,7 @@ class ProxyFetcher:
             headers = {
                 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
             }
-            async with session.get('http://httpbin.org/ip', proxy=proxy_url, headers=headers, timeout=15) as response:
+            async with session.get('http://httpbin.org/ip', proxy=proxy_url, headers=headers, timeout=60) as response:
                 if response.status == 200:
                     self.valid_proxies.add(proxy)
                     logger.info(f"Proxy {proxy} is working.")
