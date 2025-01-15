@@ -1,12 +1,9 @@
-# Auto Proxy Fetcher
-# Automatically fetch and update proxy lists from multiple sources using GitHub Actions.
-# Copyright (c) 2024 Volkan Kücükbudak
-# url: https://github.com/VolkanSah/Auto-Proxy-Fetcher
 import aiohttp
 import asyncio
 from bs4 import BeautifulSoup
 import logging
 from datetime import datetime
+import ssl
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -77,7 +74,13 @@ class ProxyFetcher:
             logger.error(f"Error parsing content from {url}: {str(e)}")
 
     async def fetch_all_proxies(self):
-        async with aiohttp.ClientSession() as session:
+        # Create a custom SSL context to disable certificate verification (similar to rejectUnauthorized: false)
+        ssl_context = ssl.create_default_context()
+        ssl_context.check_hostname = False
+        ssl_context.verify_mode = ssl.CERT_NONE
+
+        # Use the custom SSL context in the aiohttp session
+        async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl_context=ssl_context)) as session:
             tasks = [self.fetch_url(session, url) for url in self.sources]
             results = await asyncio.gather(*tasks)
             
