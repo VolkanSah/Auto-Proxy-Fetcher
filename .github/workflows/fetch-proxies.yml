@@ -27,17 +27,12 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run proxy fetcher in accetto/ubuntu-vnc-xfce-chromium-g3 Docker as root
-        uses: docker://accetto/ubuntu-vnc-xfce-chromium-g3
-        with:
-          entrypoint: /bin/bash
-          args: |
-            -c "
-            # Run as root user
-            sudo apt-get update -y && sudo apt-get install -y python3 python3-pip && \
-            sudo python3 -m venv /workspace/venv && \
+        run: |
+          docker run --rm --user root --workdir /github/workspace accetto/ubuntu-vnc-xfce-chromium-g3 bash -c "
+            apt-get update -y && apt-get install -y python3 python3-pip && \
+            python3 -m venv /workspace/venv && \
             source /workspace/venv/bin/activate && \
             pip install --upgrade pip && \
             pip install -r /workspace/requirements.txt && \
             python /workspace/fetch_proxies.py
-            "
-        options: --user root
+          "
