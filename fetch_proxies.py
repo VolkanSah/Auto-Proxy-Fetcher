@@ -1,9 +1,9 @@
 import aiohttp
 import asyncio
-from bs4 import BeautifulSoup
-import logging
 from datetime import datetime
 import ssl
+import logging
+import random
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -13,7 +13,6 @@ class ProxyFetcher:
         self.proxies = set()
         self.valid_proxies = set()
         self.sources = [
-            # GitHub Sources
             'https://raw.githubusercontent.com/clarketm/proxy-list/master/proxy-list-raw.txt',
             'https://raw.githubusercontent.com/TheSpeedX/PROXY-List/master/http.txt',
             'https://raw.githubusercontent.com/ShiftyTR/Proxy-List/master/http.txt',
@@ -21,8 +20,6 @@ class ProxyFetcher:
             'https://raw.githubusercontent.com/mertguvencli/http-proxy-list/main/proxy-list/data.txt',
             'https://raw.githubusercontent.com/roosterkid/openproxylist/main/HTTPS_RAW.txt',
             'https://raw.githubusercontent.com/RX4096/proxy-list/main/online/http.txt',
-            
-            # API Sources (free)
             'https://proxylist.geonode.com/api/proxy-list?limit=500&page=1&sort_by=lastChecked&sort_type=desc&protocols=http%2Chttps',
             'https://www.proxy-list.download/api/v1/get?type=http',
             'https://www.proxy-list.download/api/v1/get?type=https'
@@ -45,7 +42,6 @@ class ProxyFetcher:
     def parse_proxy_list(self, content, url):
         if not content:
             return
-
         try:
             # Special handling for JSON APIs
             if 'api' in url:
@@ -56,21 +52,18 @@ class ProxyFetcher:
                         proxy = f"{item.get('ip')}:{item.get('port')}"
                         self.proxies.add(proxy)
                     return
-
             # Standard line-based parsing
             lines = content.split('\n')
             for line in lines:
                 line = line.strip()
                 if line and ':' in line:
                     try:
-                        # Remove extra information after the port
                         proxy = line.split()[0] if ' ' in line else line
                         host, port = proxy.split(':')[:2]
                         if host and port.isdigit() and 1 <= int(port) <= 65535:
                             self.proxies.add(f"{host}:{port}")
                     except Exception:
                         continue
-
         except Exception as e:
             logger.error(f"Error parsing content from {url}: {str(e)}")
 
@@ -109,27 +102,21 @@ class ProxyFetcher:
             await asyncio.gather(*check_tasks)
 
     def save_proxies(self):
-        if not self.proxies:
-            logger.warning("No proxies found to save!")
+        if not self.valid_proxies:
+            logger.warning("No valid proxies found to save!")
             return
 
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         with open('proxies.txt', 'w') as f:
             f.write(f"# Proxy List - Updated: {timestamp}\n")
-            f.write(f"# Total proxies: {len(self.proxies)}\n")
             f.write(f"# Total valid proxies: {len(self.valid_proxies)}\n")
             f.write(f"# Sources used: {len(self.sources)}\n\n")
-            
-            # Save all proxies (valid and invalid)
-            f.write("# All Proxies:\n")
-            for proxy in sorted(self.proxies):
-                f.write(f"{proxy}\n")
-            
-            f.write("\n# Valid Proxies:\n")
+
+            # Save only valid proxies
             for proxy in sorted(self.valid_proxies):
                 f.write(f"{proxy}\n")
         
-        logger.info(f"Saved {len(self.proxies)} proxies and {len(self.valid_proxies)} valid proxies to proxies.txt")
+        logger.info(f"Saved {len(self.valid_proxies)} valid proxies to proxies.txt")
 
 async def main():
     fetcher = ProxyFetcher()
