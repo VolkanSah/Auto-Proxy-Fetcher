@@ -32,8 +32,9 @@ jobs:
           entrypoint: /bin/bash
           args: |
             -c "
-            # Create and activate a virtual environment inside the container
-            python -m venv /workspace/venv && \
+            # Install Python inside the container
+            apt-get update && apt-get install -y python3 python3-pip && \
+            python3 -m venv /workspace/venv && \
             source /workspace/venv/bin/activate && \
             pip install --upgrade pip && \
             pip install -r /workspace/requirements.txt && \
