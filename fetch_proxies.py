@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 class ProxyFetcher:
     def __init__(self):
         self.proxies = set()
+        self.valid_proxies = set()
         self.sources = [
             # GitHub Sources
             'https://raw.githubusercontent.com/clarketm/proxy-list/master/proxy-list-raw.txt',
@@ -73,6 +74,21 @@ class ProxyFetcher:
         except Exception as e:
             logger.error(f"Error parsing content from {url}: {str(e)}")
 
+    async def check_proxy(self, session, proxy):
+        try:
+            proxy_url = f"http://{proxy}"
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            }
+            async with session.get('http://httpbin.org/ip', proxy=proxy_url, headers=headers, timeout=15) as response:
+                if response.status == 200:
+                    self.valid_proxies.add(proxy)
+                    logger.info(f"Proxy {proxy} is working.")
+                else:
+                    logger.warning(f"Proxy {proxy} failed with status: {response.status}")
+        except Exception as e:
+            logger.error(f"Error checking proxy {proxy}: {str(e)}")
+
     async def fetch_all_proxies(self):
         # Create a custom SSL context to disable certificate verification (similar to rejectUnauthorized: false)
         ssl_context = ssl.create_default_context()
@@ -88,24 +104,28 @@ class ProxyFetcher:
                 if content:
                     self.parse_proxy_list(content, url)
 
+            # Check each proxy for validity
+            check_tasks = [self.check_proxy(session, proxy) for proxy in self.proxies]
+            await asyncio.gather(*check_tasks)
+
     def save_proxies(self):
-        if not self.proxies:
-            logger.warning("No proxies found to save!")
+        if not self.valid_proxies:
+            logger.warning("No valid proxies found to save!")
             return
 
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        with open('proxies.txt', 'w') as f:
-            f.write(f"# Proxy List - Updated: {timestamp}\n")
-            f.write(f"# Total proxies: {len(self.proxies)}\n")
+        with open('valid_proxies.txt', 'w') as f:
+            f.write(f"# Valid Proxy List - Updated: {timestamp}\n")
+            f.write(f"# Total valid proxies: {len(self.valid_proxies)}\n")
             f.write(f"# Sources used: {len(self.sources)}\n\n")
             
             # Sortiere Proxies nach IP und Port
-            sorted_proxies = sorted(self.proxies, key=lambda x: tuple(map(int, x.split(':')[0].split('.') + [x.split(':')[1]])))
+            sorted_proxies = sorted(self.valid_proxies, key=lambda x: tuple(map(int, x.split(':')[0].split('.') + [x.split(':')[1]])))
             
             for proxy in sorted_proxies:
                 f.write(f"{proxy}\n")
         
-        logger.info(f"Saved {len(self.proxies)} proxies to proxies.txt")
+        logger.info(f"Saved {len(self.valid_proxies)} valid proxies to valid_proxies.txt")
 
 async def main():
     fetcher = ProxyFetcher()
