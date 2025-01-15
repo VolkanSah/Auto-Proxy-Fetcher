@@ -16,10 +16,26 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Create virtual environment
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          python -m pip install --upgrade pip
+
+      - name: Install dependencies
+        run: |
+          source venv/bin/activate
+          pip install -r requirements.txt
+
       - name: Set up Selenium with Chrome
         uses: docker://selenium/standalone-chrome:latest
         with:
-          args: /bin/bash -c "pip install -r requirements.txt && python fetch_proxies.py"
+          args: /bin/bash -c "source /workspace/venv/bin/activate && pip install -r requirements.txt && python fetch_proxies.py"
 
       - name: Commit and push if changed
         run: |
