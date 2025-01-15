@@ -32,7 +32,6 @@ jobs:
       - name: Install Chrome and Chromedriver
         run: |
           sudo apt-get update
-          sudo apt-get install -y wget curl unzip
           sudo apt-get install -y chromium-browser
           CHROMIUM_VERSION=$(chromium-browser --version | sed 's/.* \([0-9]*\)\..*/\1/')
           DRIVER_VERSION=$(curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE_$CHROMIUM_VERSION)
