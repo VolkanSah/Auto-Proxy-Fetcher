@@ -16,13 +16,13 @@ class ProxyFetcher:
         self.proxies = set()
         self.sources = [
             # GitHub Sources
-            'https://raw.githubusercontent.com/clarketm/proxy-list/master/proxy-list-raw.txt',
-            'https://raw.githubusercontent.com/TheSpeedX/PROXY-List/master/http.txt',
-            'https://raw.githubusercontent.com/ShiftyTR/Proxy-List/master/http.txt',
-            'https://raw.githubusercontent.com/monosans/proxy-list/main/proxies/http.txt',
-            'https://raw.githubusercontent.com/mertguvencli/http-proxy-list/main/proxy-list/data.txt',
-            'https://raw.githubusercontent.com/roosterkid/openproxylist/main/HTTPS_RAW.txt',
-            'https://raw.githubusercontent.com/RX4096/proxy-list/main/online/http.txt',
+            #'https://raw.githubusercontent.com/clarketm/proxy-list/master/proxy-list-raw.txt',
+            #'https://raw.githubusercontent.com/TheSpeedX/PROXY-List/master/http.txt',
+            #'https://raw.githubusercontent.com/ShiftyTR/Proxy-List/master/http.txt',
+            #'https://raw.githubusercontent.com/monosans/proxy-list/main/proxies/http.txt',
+            #'https://raw.githubusercontent.com/mertguvencli/http-proxy-list/main/proxy-list/data.txt',
+            #'https://raw.githubusercontent.com/roosterkid/openproxylist/main/HTTPS_RAW.txt',
+            #'https://raw.githubusercontent.com/RX4096/proxy-list/main/online/http.txt',
             
             # API Sources (free)
             'https://proxylist.geonode.com/api/proxy-list?limit=500&page=1&sort_by=lastChecked&sort_type=desc&protocols=http%2Chttps',
