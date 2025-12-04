@@ -14,9 +14,7 @@ class ProxyFetcher:
 
         # DEFAULT sources (HTTP only)
         self.sources = [
-            ("https://raw.githubusercontent.com/clarketm/proxy-list/master/proxy-list-raw.txt", "http"),
             ("https://raw.githubusercontent.com/TheSpeedX/PROXY-List/master/http.txt", "http"),
-            ("https://raw.githubusercontent.com/ShiftyTR/Proxy-List/master/http.txt", "http"),
             ("https://raw.githubusercontent.com/monosans/proxy-list/main/proxies/all.txt", "http"),
         ]
 
