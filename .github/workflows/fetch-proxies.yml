@@ -2,7 +2,7 @@ name: Auto Proxy Fetch
 
 on:
   schedule:
-    - cron: '0 */1 * * *'  # Läuft alle 6 Stunden
+    - cron: '*/30 * * * *'  # Läuft alle 6 Stunden
   workflow_dispatch:        # Manueller Trigger
   push:
     paths:
