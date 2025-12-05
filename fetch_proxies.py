@@ -16,26 +16,13 @@ class ProxyFetcher:
             ("https://raw.githubusercontent.com/ClearProxy/checked-proxy-list/main/custom/youtube/http.txt", "http"),
             ("https://raw.githubusercontent.com/ClearProxy/checked-proxy-list/main/custom/youtube/socks4.txt", "socks4"),
             ("https://raw.githubusercontent.com/ClearProxy/checked-proxy-list/main/custom/youtube/socks5.txt", "socks5"),
-            ("https://raw.githubusercontent.com/ClearProxy/checked-proxy-list/main/custom/instagram/http.txt", "http"),
-            ("https://raw.githubusercontent.com/ClearProxy/checked-proxy-list/main/custom/instagram/socks4.txt", "socks4"),
-            ("https://raw.githubusercontent.com/ClearProxy/checked-proxy-list/main/custom/instagram/socks5.txt", "socks5"),
-            ("https://raw.githubusercontent.com/roosterkid/openproxylist/main/http.txt", "http"),
-            ("https://raw.githubusercontent.com/roosterkid/openproxylist/main/socks4.txt", "socks4"),
-            ("https://raw.githubusercontent.com/roosterkid/openproxylist/main/socks5.txt", "socks5"),
             ("https://raw.githubusercontent.com/monosans/proxy-list/refs/heads/main/proxies/http.txt", "http"),
             ("https://raw.githubusercontent.com/monosans/proxy-list/refs/heads/main/proxies/socks4.txt", "socks4"),
             ("https://raw.githubusercontent.com/monosans/proxy-list/refs/heads/main/proxies/socks5.txt", "socks5"),
 
-            # maintained global list sources (e.g. Proxifly or similar)
-            ("https://cdn.jsdelivr.net/gh/proxifly/free-proxy-list@main/proxies/protocols/http/data.txt", "http"),
-            ("https://cdn.jsdelivr.net/gh/proxifly/free-proxy-list@main/proxies/protocols/https/data.txt", "http"),
-            ("https://cdn.jsdelivr.net/gh/proxifly/free-proxy-list@main/proxies/protocols/socks4/data.txt", "socks4"),
             ("https://cdn.jsdelivr.net/gh/proxifly/free-proxy-list@main/proxies/protocols/socks5/data.txt", "socks5"),
 
-            # databay-labs free proxy lists
-            ("https://databay.com/free-proxy-list", "http"),      # HTTP/HTTPS text dump or HTML list
-            ("https://databay.com/free-proxy-list", "https"),     # treat as https (same list)
-            ("https://databay.com/free-proxy-list", "socks5"),    # SOCKS5 list
+
         ]
 
     async def fetch_url(self, session, url):
