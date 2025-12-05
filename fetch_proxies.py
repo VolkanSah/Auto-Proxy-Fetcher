@@ -18,10 +18,7 @@ class ProxyFetcher:
             ("https://raw.githubusercontent.com/ClearProxy/checked-proxy-list/main/custom/youtube/socks5.txt", "socks5"),
             ("https://raw.githubusercontent.com/monosans/proxy-list/refs/heads/main/proxies/http.txt", "http"),
             ("https://raw.githubusercontent.com/monosans/proxy-list/refs/heads/main/proxies/socks4.txt", "socks4"),
-            ("https://raw.githubusercontent.com/monosans/proxy-list/refs/heads/main/proxies/socks5.txt", "socks5"),
-
-            ("https://cdn.jsdelivr.net/gh/proxifly/free-proxy-list@main/proxies/protocols/socks5/data.txt", "socks5"),
-
+            ("https://raw.githubusercontent.com/monosans/proxy-list/refs/heads/main/proxies/socks5.txt", "socks5")
 
         ]
 
