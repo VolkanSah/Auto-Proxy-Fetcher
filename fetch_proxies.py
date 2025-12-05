@@ -12,6 +12,8 @@ class ProxyFetcher:
     def __init__(self):
         self.proxies = set()
 
+        # The list of sources is quite long, so I'm omitting it here for brevity 
+        # but using your exact original list in the fixed code.
         self.sources = [
             ("https://raw.githubusercontent.com/ClearProxy/checked-proxy-list/main/custom/youtube/http.txt", "http"),
             ("https://raw.githubusercontent.com/ClearProxy/checked-proxy-list/main/custom/youtube/socks4.txt", "socks4"),
@@ -24,7 +26,8 @@ class ProxyFetcher:
             ("https://raw.githubusercontent.com/roosterkid/openproxylist/main/socks4.txt", "socks4"),
             ("https://raw.githubusercontent.com/roosterkid/openproxylist/main/socks5.txt", "socks5"),
 
-            ("https://raw.githubusercontent.com/monosans/proxy-list/refs/heads/main/proxies/http.txt5", "http"),
+            # FIX: Corrected a typo in this URL, which had 'txt5' instead of 'txt'
+            ("https://raw.githubusercontent.com/monosans/proxy-list/refs/heads/main/proxies/http.txt", "http"), 
             ("https://raw.githubusercontent.com/monosans/proxy-list/refs/heads/main/proxies/socks4.txt", "socks4"),
             ("https://raw.githubusercontent.com/monosans/proxy-list/refs/heads/main/proxies/socks5.txt", "socks5"),
 
@@ -115,24 +118,30 @@ class ProxyFetcher:
             return
 
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        # Convert the set to a list to allow shuffling.
+        proxy_list = list(self.proxies) 
+        # Shuffle the list in-place.
+        random.shuffle(proxy_list) 
 
         # Save metadata
         with open("info.txt", "w", encoding="utf-8") as f:
             f.write("# High-Quality Proxy List\n")
             f.write(f"# Updated: {timestamp}\n")
-            f.write(f"# Total unique proxies: {len(self.proxies)}\n")
+            f.write(f"# Total unique proxies: {len(proxy_list)}\n") # Use proxy_list length
             f.write(f"# Sources: {len(self.sources)} URLs\n\n")
 
             f.write("# Sources used:\n")
             for url, protocol in self.sources:
                 f.write(f"#   [{protocol.upper()}] {url}\n")
 
-        # Save proxies
+        # Save proxies - FIX APPLIED HERE
         with open("proxies.txt", "w", encoding="utf-8") as f:
-            for proxy in random.shuffle(self.proxies):
+            # Iterate over the shuffled list
+            for proxy in proxy_list: 
                 f.write(proxy + "\n")
 
-        logger.info(f"Saved {len(self.proxies)} unique proxies to proxies.txt")
+        logger.info(f"Saved {len(proxy_list)} unique proxies to proxies.txt")
 
 
 async def main():
