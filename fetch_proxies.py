@@ -111,21 +111,18 @@ class ProxyFetcher:
             return
 
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        os.makedirs("output", exist_ok=True)
-
         # Save metadata
-        with open("output/info.txt", "w", encoding="utf-8") as f:
-            f.write(f"# High-Quality Proxy List (Quality-First Aggregation)\n")
+        with open("info.txt", "w", encoding="utf-8") as f:
+            f.write(f"# High-Quality Proxy List (-)\n")
             f.write(f"# Updated: {timestamp}\n")
             f.write(f"# Total unique proxies: {len(self.proxies)}\n")
-            f.write(f"# Sources: {len(self.sources)} quality-curated URLs\n")
-            f.write(f"# Focus: Freshness > Volume | Auto-updated | Verified where possible\n")
-            f.write(f"\n# Sources used:\n")
+            f.write(f"# Sources: {len(self.sources)} URLs\n")
+             f.write(f"\n# Sources used:\n")
             for url, protocol in self.sources:
                 f.write(f"#   [{protocol.upper()}] {url}\n")
 
         # Save proxies
-        with open("output/proxies.txt", "w", encoding="utf-8") as f:
+        with open("proxies.txt", "w", encoding="utf-8") as f:
             for proxy in sorted(self.proxies):
                 f.write(proxy + "\n")
 
