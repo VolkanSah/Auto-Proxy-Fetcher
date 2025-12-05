@@ -17,7 +17,6 @@ class ProxyFetcher:
             ("https://raw.githubusercontent.com/monosans/proxy-list/main/proxies/all.txt", "http"),
         ]
 
-        # CUSTOM GitHub-token-protected sources (automatic protocol)
         self.sources += [
             # YOUTUBE
             ("https://raw.githubusercontent.com/ClearProxy/checked-proxy-list/refs/heads/main/custom/youtube/socks5.txt", "socks5"),
