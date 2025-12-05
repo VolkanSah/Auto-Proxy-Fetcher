@@ -30,8 +30,7 @@ class ProxyFetcher:
             ("https://raw.githubusercontent.com/ALIILAPRO/Proxy/main/socks5.txt", "socks5"),
 
             ("https://raw.githubusercontent.com/hookzof/socks5_list/main/proxy.txt", "socks5"),
-            ("https://raw.githubusercontent.com/TheSpeedX/PROXY-List/master/http.txt", "http"),
-        ]
+       ]
 
     async def fetch_url(self, session, url):
         try:
