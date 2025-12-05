@@ -1,6 +1,7 @@
 import aiohttp
 import asyncio
 import logging
+import random
 from datetime import datetime
 
 logging.basicConfig(level=logging.INFO)
@@ -22,6 +23,11 @@ class ProxyFetcher:
             ("https://raw.githubusercontent.com/roosterkid/openproxylist/main/http.txt", "http"),
             ("https://raw.githubusercontent.com/roosterkid/openproxylist/main/socks4.txt", "socks4"),
             ("https://raw.githubusercontent.com/roosterkid/openproxylist/main/socks5.txt", "socks5"),
+
+            ("https://raw.githubusercontent.com/monosans/proxy-list/refs/heads/main/proxies/http.txt5", "http"),
+            ("https://raw.githubusercontent.com/monosans/proxy-list/refs/heads/main/proxies/socks4.txt", "socks4"),
+            ("https://raw.githubusercontent.com/monosans/proxy-list/refs/heads/main/proxies/socks5.txt", "socks5"),
+
 
            ]
 
@@ -123,7 +129,7 @@ class ProxyFetcher:
 
         # Save proxies
         with open("proxies.txt", "w", encoding="utf-8") as f:
-            for proxy in sorted(self.proxies):
+            for proxy in random.shuffle(self.proxies):
                 f.write(proxy + "\n")
 
         logger.info(f"Saved {len(self.proxies)} unique proxies to proxies.txt")
