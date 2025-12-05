@@ -19,18 +19,11 @@ class ProxyFetcher:
             ("https://raw.githubusercontent.com/ClearProxy/checked-proxy-list/main/custom/instagram/socks4.txt", "socks4"),
             ("https://raw.githubusercontent.com/ClearProxy/checked-proxy-list/main/custom/instagram/socks5.txt", "socks5"),
 
-            ("https://raw.githubusercontent.com/proxifly/free-proxy-list/main/proxies/all.txt", "http"),
-
             ("https://raw.githubusercontent.com/roosterkid/openproxylist/main/http.txt", "http"),
             ("https://raw.githubusercontent.com/roosterkid/openproxylist/main/socks4.txt", "socks4"),
             ("https://raw.githubusercontent.com/roosterkid/openproxylist/main/socks5.txt", "socks5"),
 
-            ("https://raw.githubusercontent.com/ALIILAPRO/Proxy/main/http.txt", "http"),
-            ("https://raw.githubusercontent.com/ALIILAPRO/Proxy/main/socks4.txt", "socks4"),
-            ("https://raw.githubusercontent.com/ALIILAPRO/Proxy/main/socks5.txt", "socks5"),
-
-            ("https://raw.githubusercontent.com/hookzof/socks5_list/main/proxy.txt", "socks5"),
-       ]
+           ]
 
     async def fetch_url(self, session, url):
         try:
