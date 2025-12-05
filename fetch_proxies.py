@@ -22,14 +22,14 @@ class ProxyFetcher:
             #("https://raw.githubusercontent.com/ClearProxy/checked-proxy-list/main/custom/instagram/socks4.txt", "socks4"),
             #("https://raw.githubusercontent.com/ClearProxy/checked-proxy-list/main/custom/instagram/socks5.txt", "socks5"),
 
-            ("https://raw.githubusercontent.com/roosterkid/openproxylist/main/http.txt", "http"),
-            ("https://raw.githubusercontent.com/roosterkid/openproxylist/main/socks4.txt", "socks4"),
-            ("https://raw.githubusercontent.com/roosterkid/openproxylist/main/socks5.txt", "socks5"),
+            #("https://raw.githubusercontent.com/roosterkid/openproxylist/main/http.txt", "http"),
+            #("https://raw.githubusercontent.com/roosterkid/openproxylist/main/socks4.txt", "socks4"),
+            #("https://raw.githubusercontent.com/roosterkid/openproxylist/main/socks5.txt", "socks5"),
 
             # FIX: Corrected a typo in this URL, which had 'txt5' instead of 'txt'
-            #("https://raw.githubusercontent.com/monosans/proxy-list/refs/heads/main/proxies/http.txt", "http"), 
-            #("https://raw.githubusercontent.com/monosans/proxy-list/refs/heads/main/proxies/socks4.txt", "socks4"),
-            #("https://raw.githubusercontent.com/monosans/proxy-list/refs/heads/main/proxies/socks5.txt", "socks5"),
+            ("https://raw.githubusercontent.com/monosans/proxy-list/refs/heads/main/proxies/http.txt", "http"), 
+            ("https://raw.githubusercontent.com/monosans/proxy-list/refs/heads/main/proxies/socks4.txt", "socks4"),
+            ("https://raw.githubusercontent.com/monosans/proxy-list/refs/heads/main/proxies/socks5.txt", "socks5"),
 
 
            ]
