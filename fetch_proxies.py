@@ -12,8 +12,7 @@ class ProxyFetcher:
     def __init__(self):
         self.proxies = set()
 
-        # The list of sources is quite long, so I'm omitting it here for brevity 
-        # but using your exact original list in the fixed code.
+        
         self.sources = [
             #("https://raw.githubusercontent.com/ClearProxy/checked-proxy-list/main/custom/instagram/http.txt", "http"),
             #("https://raw.githubusercontent.com/ClearProxy/checked-proxy-list/main/custom/instagram/socks4.txt", "socks4"),
