@@ -13,21 +13,34 @@ class ProxyFetcher:
         self.proxies = {
             "youtube": set(),
             "google": set(),
+            "discord": set(),
+            "instagram": set(),
             "misc": set(),
         }
 
+        # Define all proxy sources by category
         self.sources = [
-            # YouTube sources
+            # YouTube
             ("https://raw.githubusercontent.com/ClearProxy/checked-proxy-list/main/custom/youtube/http.txt", "http", "youtube"),
             ("https://raw.githubusercontent.com/ClearProxy/checked-proxy-list/main/custom/youtube/socks4.txt", "socks4", "youtube"),
             ("https://raw.githubusercontent.com/ClearProxy/checked-proxy-list/main/custom/youtube/socks5.txt", "socks5", "youtube"),
 
-            # Google sources
+            # Google
             ("https://raw.githubusercontent.com/ClearProxy/checked-proxy-list/main/custom/google/http.txt", "http", "google"),
             ("https://raw.githubusercontent.com/ClearProxy/checked-proxy-list/main/custom/google/socks4.txt", "socks4", "google"),
             ("https://raw.githubusercontent.com/ClearProxy/checked-proxy-list/main/custom/google/socks5.txt", "socks5", "google"),
 
-            # Misc sources
+            # Discord
+            ("https://raw.githubusercontent.com/ClearProxy/checked-proxy-list/main/custom/discord/http.txt", "http", "discord"),
+            ("https://raw.githubusercontent.com/ClearProxy/checked-proxy-list/main/custom/discord/socks4.txt", "socks4", "discord"),
+            ("https://raw.githubusercontent.com/ClearProxy/checked-proxy-list/main/custom/discord/socks5.txt", "socks5", "discord"),
+
+            # Instagram
+            ("https://raw.githubusercontent.com/ClearProxy/checked-proxy-list/main/custom/instagram/http.txt", "http", "instagram"),
+            ("https://raw.githubusercontent.com/ClearProxy/checked-proxy-list/main/custom/instagram/socks4.txt", "socks4", "instagram"),
+            ("https://raw.githubusercontent.com/ClearProxy/checked-proxy-list/main/custom/instagram/socks5.txt", "socks5", "instagram"),
+
+            # Miscellaneous (Monosans)
             ("https://raw.githubusercontent.com/monosans/proxy-list/refs/heads/main/proxies/http.txt", "http", "misc"),
             ("https://raw.githubusercontent.com/monosans/proxy-list/refs/heads/main/proxies/socks4.txt", "socks4", "misc"),
             ("https://raw.githubusercontent.com/monosans/proxy-list/refs/heads/main/proxies/socks5.txt", "socks5", "misc"),
@@ -47,7 +60,6 @@ class ProxyFetcher:
         except asyncio.TimeoutError:
             logger.error(f"Timeout fetching {url}")
             return None
-
         except Exception as e:
             logger.error(f"Error fetching {url}: {type(e).__name__} - {e}")
             return None
@@ -55,7 +67,6 @@ class ProxyFetcher:
     def parse_proxy_list(self, content, protocol, category):
         if not content:
             return
-
         for line in content.splitlines():
             line = line.strip()
             if not line or line.startswith("#"):
@@ -73,20 +84,21 @@ class ProxyFetcher:
 
                 host = parts[0].strip()
                 port = parts[1].split("/")[0].split("#")[0].strip()
+
                 if not port.isdigit():
                     continue
 
                 port_int = int(port)
                 if not (1 <= port_int <= 65535):
                     continue
+
                 if "." not in host and ":" not in host:
                     continue
 
                 proxy_url = f"{protocol}://{host}:{port}"
                 self.proxies[category].add(proxy_url)
-
             except Exception:
-                continue  # Ignore malformed entries
+                continue
 
     async def fetch_all_proxies(self):
         connector = aiohttp.TCPConnector(limit=30, limit_per_host=10)
@@ -104,10 +116,10 @@ class ProxyFetcher:
 
     def save_proxies(self):
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        total_proxies = sum(len(v) for v in self.proxies.values())
 
-        # Save info metadata
+        # Save info.txt metadata
         with open("info.txt", "w", encoding="utf-8") as f:
-            total_proxies = sum(len(v) for v in self.proxies.values())
             f.write("# High-Quality Proxy List\n")
             f.write(f"# Updated: {timestamp}\n")
             f.write(f"# Total unique proxies: {total_proxies}\n")
@@ -116,7 +128,7 @@ class ProxyFetcher:
             for url, protocol, category in self.sources:
                 f.write(f"#   [{category.upper()} | {protocol.upper()}] {url}\n")
 
-        # Save each category separately
+        # Save per-category proxy files
         for category, proxy_set in self.proxies.items():
             if not proxy_set:
                 logger.warning(f"No {category} proxies found to save.")
