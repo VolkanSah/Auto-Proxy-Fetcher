@@ -21,7 +21,7 @@ class ProxyFetcher:
             ("https://raw.githubusercontent.com/ClearProxy/checked-proxy-list/main/custom/youtube/socks4.txt", "socks4"),
             ("https://raw.githubusercontent.com/ClearProxy/checked-proxy-list/main/custom/youtube/socks5.txt", "socks5"),
             #("https://raw.githubusercontent.com/ClearProxy/checked-proxy-list/main/custom/google/http.txt", "http"),
-           # ("https://raw.githubusercontent.com/ClearProxy/checked-proxy-list/main/custom/google/socks4.txt", "socks4"),
+           # #("https://raw.githubusercontent.com/ClearProxy/checked-proxy-list/main/custom/google/socks4.txt", "socks4"),
             #("https://raw.githubusercontent.com/ClearProxy/checked-proxy-list/main/custom/google/socks5.txt", "socks5"),
 
             #("https://raw.githubusercontent.com/roosterkid/openproxylist/main/http.txt", "http"),
