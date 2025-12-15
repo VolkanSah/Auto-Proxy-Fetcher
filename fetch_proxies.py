@@ -44,6 +44,9 @@ class ProxyFetcher:
             ("https://raw.githubusercontent.com/monosans/proxy-list/refs/heads/main/proxies/http.txt", "http", "misc"),
             ("https://raw.githubusercontent.com/monosans/proxy-list/refs/heads/main/proxies/socks4.txt", "socks4", "misc"),
             ("https://raw.githubusercontent.com/monosans/proxy-list/refs/heads/main/proxies/socks5.txt", "socks5", "misc"),
+            ("https://raw.githubusercontent.com/roosterkid/openproxylist/refs/heads/main/HTTPS_RAW.txt", "http", "misc"),
+            ("https://raw.githubusercontent.com/roosterkid/openproxylist/refs/heads/main/SOCKS4_RAW.txt", "socks4", "misc"),
+                        ("https://raw.githubusercontent.com/roosterkid/openproxylist/refs/heads/main/SOCKS5_RAW.txt", "socks5", "misc"),
         ]
 
     async def fetch_url(self, session, url):
