@@ -1,7 +1,7 @@
 # High-Quality Proxy List
-# Updated: 2025-12-15 05:50:10
-# Total unique proxies: 477
-# Sources: 15 URLs
+# Updated: 2025-12-15 05:59:26
+# Total unique proxies: 894
+# Sources: 18 URLs
 
 # Sources used:
 #   [YOUTUBE | HTTP] https://raw.githubusercontent.com/ClearProxy/checked-proxy-list/main/custom/youtube/http.txt
@@ -19,3 +19,6 @@
 #   [MISC | HTTP] https://raw.githubusercontent.com/monosans/proxy-list/refs/heads/main/proxies/http.txt
 #   [MISC | SOCKS4] https://raw.githubusercontent.com/monosans/proxy-list/refs/heads/main/proxies/socks4.txt
 #   [MISC | SOCKS5] https://raw.githubusercontent.com/monosans/proxy-list/refs/heads/main/proxies/socks5.txt
+#   [MISC | HTTP] https://raw.githubusercontent.com/roosterkid/openproxylist/refs/heads/main/HTTPS_RAW.txt
+#   [MISC | SOCKS4] https://raw.githubusercontent.com/roosterkid/openproxylist/refs/heads/main/SOCKS4_RAW.txt
+#   [MISC | SOCKS5] https://raw.githubusercontent.com/roosterkid/openproxylist/refs/heads/main/SOCKS5_RAW.txt
