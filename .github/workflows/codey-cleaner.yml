@@ -72,33 +72,38 @@ jobs:
             let totalSkipped = 0;
 
             for (const wf of workflows) {
-              const runs = await github.paginate(
-                github.rest.actions.listWorkflowRuns,
-                { owner, repo, workflow_id: wf.id, per_page: 100 }
-              );
+              let page      = 1;
+              let deleted   = 0;
+              let skipped   = 0;
+              let keepCount = 0;
 
-              const sorted     = runs.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-              const candidates = sorted.slice(keepMin);
+              while (true) {
+                const { data } = await github.rest.actions.listWorkflowRuns({
+                  owner, repo, workflow_id: wf.id, per_page: 50, page
+                });
 
-              const toDelete = candidates.filter(r => {
-                const oldEnough   = new Date(r.created_at) < cutoff;
-                const statusMatch = statusFilter === 'all' || r.conclusion === statusFilter;
-                return oldEnough && statusMatch;
-              });
+                if (data.workflow_runs.length === 0) break;
 
-              const skipped = candidates.length - toDelete.length;
-              totalSkipped += skipped;
-
-              for (const run of toDelete) {
-                try {
-                  await github.rest.actions.deleteWorkflowRun({ owner, repo, run_id: run.id });
-                  totalDeleted++;
-                } catch (e) {
-                  console.log(`  [SKIP] run ${run.id} — ${e.message}`);
+                for (const run of data.workflow_runs) {
+                  if (keepCount < keepMin) { keepCount++; skipped++; continue; }
+                  const oldEnough   = new Date(run.created_at) < cutoff;
+                  const statusMatch = statusFilter === 'all' || run.conclusion === statusFilter;
+                  if (oldEnough && statusMatch) {
+                    try {
+                      await github.rest.actions.deleteWorkflowRun({ owner, repo, run_id: run.id });
+                      deleted++;
+                    } catch (e) {
+                      console.log(`  [SKIP] run ${run.id} — ${e.message}`);
+                      skipped++;
+                    }
+                  } else {
+                    skipped++;
+                  }
                 }
+                page++;
               }
 
-              console.log(`[${wf.name}]  found ${runs.length} | deleted ${toDelete.length} | skipped ${skipped}`);
+              console.log(`[${wf.name}]  deleted ${deleted} | skipped ${skipped}`);
             }
 
             console.log('─'.repeat(60));
