@@ -1,0 +1,107 @@
+name: (.codey-lab) Workflows run cleaner under ESOL
+
+on:
+  workflow_dispatch:
+    inputs:
+      days:
+        description: 'Delete runs older than X days (30/60/90)'
+        required: false
+        default: '30'
+      keep_minimum:
+        description: 'Always keep at least X runs per workflow'
+        required: false
+        default: '5'
+      status_filter:
+        description: 'Which runs to delete'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - failure
+          - cancelled
+          - skipped
+          - success
+      workflow_filter:
+        description: 'Workflow name to target (leave empty = all workflows)'
+        required: false
+        default: ''
+
+permissions:
+  actions: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete workflow runs
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const days         = parseInt('${{ inputs.days }}')         || 30;
+            const keepMin      = parseInt('${{ inputs.keep_minimum }}') || 5;
+            const statusFilter = '${{ inputs.status_filter }}';
+            const wfFilter     = '${{ inputs.workflow_filter }}'.trim().toLowerCase();
+            const cutoff       = new Date(Date.now() - days * 864e5);
+            const owner        = context.repo.owner;
+            const repo         = context.repo.repo;
+
+            console.log('─'.repeat(60));
+            console.log(`Repo          : ${owner}/${repo}`);
+            console.log(`Older than    : ${days} days (before ${cutoff.toISOString()})`);
+            console.log(`Keep minimum  : ${keepMin} per workflow`);
+            console.log(`Status filter : ${statusFilter}`);
+            console.log(`Workflow name : ${wfFilter || '(all)'}`);
+            console.log('─'.repeat(60));
+
+            const allWorkflows = await github.paginate(
+              github.rest.actions.listRepoWorkflows,
+              { owner, repo, per_page: 100 }
+            );
+
+            const workflows = wfFilter
+              ? allWorkflows.filter(w => w.name.toLowerCase().includes(wfFilter))
+              : allWorkflows;
+
+            if (workflows.length === 0) {
+              console.log('No matching workflows found.');
+              return;
+            }
+
+            let totalDeleted = 0;
+            let totalSkipped = 0;
+
+            for (const wf of workflows) {
+              const runs = await github.paginate(
+                github.rest.actions.listWorkflowRuns,
+                { owner, repo, workflow_id: wf.id, per_page: 100 }
+              );
+
+              const sorted     = runs.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+              const candidates = sorted.slice(keepMin);
+
+              const toDelete = candidates.filter(r => {
+                const oldEnough   = new Date(r.created_at) < cutoff;
+                const statusMatch = statusFilter === 'all' || r.conclusion === statusFilter;
+                return oldEnough && statusMatch;
+              });
+
+              const skipped = candidates.length - toDelete.length;
+              totalSkipped += skipped;
+
+              for (const run of toDelete) {
+                try {
+                  await github.rest.actions.deleteWorkflowRun({ owner, repo, run_id: run.id });
+                  totalDeleted++;
+                } catch (e) {
+                  console.log(`  [SKIP] run ${run.id} — ${e.message}`);
+                }
+              }
+
+              console.log(`[${wf.name}]  found ${runs.length} | deleted ${toDelete.length} | skipped ${skipped}`);
+            }
+
+            console.log('─'.repeat(60));
+            console.log(`Total deleted : ${totalDeleted}`);
+            console.log(`Total skipped : ${totalSkipped}`);
+            console.log('Done ✓');
