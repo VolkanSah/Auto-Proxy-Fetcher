@@ -26,8 +26,8 @@ class ProxyFetcher:
             
             # API Sources (free)
             'https://proxylist.geonode.com/api/proxy-list?limit=500&page=1&sort_by=lastChecked&sort_type=desc&protocols=http%2Chttps',
-            'https://www.proxy-list.download/api/v1/get?type=http',
-            'https://www.proxy-list.download/api/v1/get?type=https'
+            #'https://www.proxy-list.download/api/v1/get?type=http',
+            #'https://www.proxy-list.download/api/v1/get?type=https'
         ]
 
     async def fetch_url(self, session, url):
